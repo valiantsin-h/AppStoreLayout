@@ -44,11 +44,24 @@ class ViewController: UIViewController {
     func createLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewCompositionalLayout
         { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
+            
             let section = self.sections[sectionIndex]
             
             let headerItemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.92), heightDimension: .estimated(44))
             let headerItem = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerItemSize, elementKind: SupplementaryViewKind.header, alignment: .top)
             headerItem.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 4, bottom: 0, trailing: 4)
+            
+            let lineItemHeight = 1 / layoutEnvironment.traitCollection.displayScale
+            let lineItemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.92), heightDimension: .absolute(lineItemHeight))
+            
+            let topLineItem = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: lineItemSize, elementKind: SupplementaryViewKind.topLine, alignment: .top)
+            
+            let bottomLineItem = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: lineItemSize, elementKind: SupplementaryViewKind.bottomLine, alignment: .bottom)
+            
+            let supplementaryItemContentInsets = NSDirectionalEdgeInsets(top: 0, leading: 4, bottom: 0, trailing: 4)
+            headerItem.contentInsets = supplementaryItemContentInsets
+            topLineItem.contentInsets = supplementaryItemContentInsets
+            bottomLineItem.contentInsets = supplementaryItemContentInsets
             
             switch section {
             case .promoted:
@@ -59,7 +72,10 @@ class ViewController: UIViewController {
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.92), heightDimension: .estimated(300))
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
                 let section = NSCollectionLayoutSection(group: group)
-                section.orthogonalScrollingBehavior = .paging
+                section.orthogonalScrollingBehavior = .groupPagingCentered
+                section.boundarySupplementaryItems = [topLineItem, bottomLineItem]
+                
+                section.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 0, bottom: 20, trailing: 0)
                 
                 return section
                 
@@ -73,8 +89,11 @@ class ViewController: UIViewController {
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitem: item, count: 3)
                 
                 let section = NSCollectionLayoutSection(group: group)
+                
                 section.orthogonalScrollingBehavior = .groupPagingCentered
-                section.boundarySupplementaryItems = [headerItem]
+                section.boundarySupplementaryItems = [headerItem, bottomLineItem]
+                
+                section.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 0, bottom: 20, trailing: 0)
                 
                 return section
                 
@@ -95,6 +114,7 @@ class ViewController: UIViewController {
                 let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .estimated(44))
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
                 let section = NSCollectionLayoutSection(group: group)
+                section.boundarySupplementaryItems = [headerItem]
                 
                 return section
             }
